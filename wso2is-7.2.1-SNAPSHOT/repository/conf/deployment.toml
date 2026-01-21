@@ -1,0 +1,228 @@
+[server]
+hostname = "localhost"
+node_ip = "127.0.0.1"
+base_path = "https://$ref{server.hostname}:${carbon.management.port}"
+
+[super_admin]
+username = "admin"
+password = "admin"
+create_admin_account = true
+
+[user_store]
+type = "database_unique_id"
+
+[database.identity_db]
+type = "h2"
+url = "jdbc:h2:./repository/database/WSO2IDENTITY_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000"
+username = "wso2carbon"
+password = "wso2carbon"
+
+[database.shared_db]
+type = "h2"
+url = "jdbc:h2:./repository/database/WSO2SHARED_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000"
+username = "wso2carbon"
+password = "wso2carbon"
+
+[datasource.AgentIdentity]
+id = "AgentIdentity"
+url = "jdbc:h2:./repository/database/WSO2AGENTIDENTITY_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000"
+username = "wso2carbon"
+password = "wso2carbon"
+driver = "org.h2.Driver"
+
+[keystore.primary]
+file_name = "wso2carbon.p12"
+password = "wso2carbon"
+type="PKCS12"
+
+[truststore]
+file_name="client-truststore.p12"
+password="wso2carbon"
+type="PKCS12"
+
+[account_recovery.endpoint.auth]
+hash= "66cd9688a2ae068244ea01e70f0e230f5623b7fa4cdecb65070a09ec06452262"
+
+[identity.auth_framework.endpoint]
+app_password= "dashboard"
+
+# The KeyStore which is used for encrypting/decrypting internal data. By default the primary keystore is used as the internal keystore.
+
+#[keystore.internal]
+#file_name = "$ref{keystore.primary.file_name}"
+#type = "$ref{keystore.primary.type}"
+#password = "$ref{keystore.primary.password}"
+#alias = "$ref{keystore.primary.alias}"
+#key_password = "$ref{keystore.primary.key_password}"
+
+# The KeyStore which is used for tls communication. By default the primary keystore is used as the tls keystore.
+
+#[keystore.tls]
+#file_name = "$ref{keystore.primary.file_name}"
+#type = "$ref{keystore.primary.type}"
+#password = "$ref{keystore.primary.password}"
+#alias = "$ref{keystore.primary.alias}"
+#key_password = "$ref{keystore.primary.key_password}"
+
+#Google reCAPTCHA settings.
+
+#[recaptcha]
+#enabled = true
+#api_url = "https://www.google.com/recaptcha/api.js"
+#verify_url = "https://www.google.com/recaptcha/api/siteverify"
+#site_key = ""
+#secret_key = ""
+
+# SMTP email sender settings.
+#[output_adapter.email]
+#from_address= "abcd@gmail.com"
+#username= "abcd"
+#password= "xxxx"
+#hostname= "smtp.gmail.com"
+#port= 587
+
+#----------------------------------------------------------------------------------------------------------
+# OpenID4VP Full-Featured Authenticator Configuration
+#----------------------------------------------------------------------------------------------------------
+
+[[authentication.custom_authenticator]]
+name = "OpenID4VPAuthenticator"
+enable = true
+
+[authentication.custom_authenticator.parameters]
+displayName = "Wallet (OpenID4VP)"
+
+# Enable debug logging for OpenID4VP components
+[[logging.logger]]
+name = "org.wso2.carbon.identity.openid4vc.presentation"
+level = "DEBUG"
+additivity = false
+appenderRef = "CARBON_LOGFILE"
+
+# Allow unauthenticated access to OpenID4VP endpoints
+[[resource.access_control]]
+context = "(.*)/openid4vp(.*)"
+secure = "false"
+http_method = "all"
+
+# Cache configuration for VP requests
+[[cache.manager]]
+name = "OpenID4VPCache"
+timeout = "300"
+capacity = "5000"
+
+
+#----------------------------------------------------------------------------------------------------------
+# Resource Access Control
+#----------------------------------------------------------------------------------------------------------
+
+# Allow unauthenticated access to OpenID4VP endpoints
+[[resource.access_control]]
+context = "(.*)/openid4vp(.*)"
+secure = "false"
+http_method = "all"
+
+# Allow access to template management endpoints
+[[resource.access_control]]
+context = "(.*)/template-admin(.*)"
+secure = false
+http_method = "GET,POST,DELETE"
+
+# =============================================
+# OpenID4VP Presentation Configuration
+# =============================================
+
+[openid4vp]
+# Enable/disable the OpenID4VP feature
+enabled = true
+
+# Request expiry time in seconds (default: 300 = 5 minutes)
+request_expiry_seconds = 300
+
+# Long polling timeout in seconds (default: 30)
+long_polling_timeout_seconds = 30
+
+# Maximum polling attempts (default: 60)
+max_polling_attempts = 60
+
+# Enable strict verifier validation
+strict_verifier_validation = false
+
+# =============================================
+# Request Modes
+# =============================================
+
+[openid4vp.request]
+# Default request mode: "by_value" or "by_reference"
+default_mode = "by_value"
+
+# Enable request_uri (by_reference) support
+enable_request_uri = true
+
+# Request URI base path (for by_reference mode)
+request_uri_base = "https://localhost:9443/api/openid4vp/v1/request"
+
+# =============================================
+# Credential Verification
+# =============================================
+
+[openid4vp.verification]
+# Supported credential formats
+supported_formats = ["jwt_vc_json", "jwt_vc_json-ld", "ldp_vc", "vc+sd-jwt"]
+
+# Enable signature verification
+verify_signatures = true
+
+# Enable issuer validation
+validate_issuer = true
+
+# Enable expiry check
+check_expiry = true
+
+# Enable revocation check
+check_revocation = true
+
+# =============================================
+# DID Resolution
+# =============================================
+
+[openid4vp.did]
+# Supported DID methods
+supported_methods = ["did:jwk", "did:key", "did:web"]
+
+# Universal resolver URL (optional, for unsupported methods)
+universal_resolver_url = "https://dev.uniresolver.io/1.0/identifiers/"
+
+# Cache DID documents (seconds)
+cache_ttl_seconds = 3600
+
+# =============================================
+# Revocation
+# =============================================
+
+[openid4vp.revocation]
+# Enable revocation checking
+enabled = true
+
+# Supported status list types
+supported_types = ["StatusList2021", "BitStringStatusList"]
+
+# Status list cache TTL (seconds)
+cache_ttl_seconds = 300
+
+# =============================================
+# Security
+# =============================================
+
+[openid4vp.security]
+# Nonce length in bytes
+nonce_length = 32
+
+# State length in bytes
+state_length = 16
+
+# Allowed redirect URI schemes
+allowed_redirect_schemes = ["https", "http://localhost"]
+
+# CORS allowed origins (comma-separated)
+cors_allowed_origins = "*"
